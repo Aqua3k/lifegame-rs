@@ -12,19 +12,23 @@ fn get_file_path() -> Result<String, io::Error> {
     Ok(args[1].clone())
 }
 
-fn open_file_as_reader(path: &str) -> io::Result<BufReader<File>> {
+/// 引数のファイルの内容を出力する
+fn print_file(path: &str) -> io::Result<()> {
     let file = File::open(path)?;
-    Ok(BufReader::new(file))
+    let reader = BufReader::new(file);
+
+    println!("#----------------#");
+        for line_result in reader.lines() {
+        let line = line_result?;
+        println!("{}", line);
+    }
+    println!("#----------------#");
+
+    Ok(())
 }
 
 fn main() -> io::Result<()> {
     let path = get_file_path()?;
-    let reader = open_file_as_reader(&path)?;
-
-    for line_result in reader.lines() {
-        let line = line_result?;
-        println!("{}", line);
-    }
-
+    print_file(&path)?;
     Ok(())
 }

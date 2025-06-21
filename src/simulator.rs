@@ -13,7 +13,7 @@ const ADJACENT_DELTAS: [(i8, i8); 8] = [
     ( 1, -1), ( 1,  0), ( 1,  1),
 ];
 
-struct LifeGameSimulator {
+pub struct LifeGameSimulator {
     grid: Vec<Vec<CellStatus>>,
     simulate_width: usize,
     simulate_height: usize,
@@ -58,9 +58,9 @@ impl LifeGameSimulator {
             // 列方向 本体データを作る
             for j in 0..max_width {
                 let status = if status[i][j] == 0 {
-                    CellStatus::ALIVE
-                } else {
                     CellStatus::DEAD
+                } else {
+                    CellStatus::ALIVE
                 };
                 array.push(status);
             }
@@ -71,7 +71,8 @@ impl LifeGameSimulator {
             }
 
             // サイズチェック
-            assert!(array.len() == simulate_width);
+            assert_eq!(array.len(), simulate_width);
+            grid.push(array);
         }
 
         // 行方向 後半のパディングを入れる
@@ -81,7 +82,7 @@ impl LifeGameSimulator {
         }
 
         // サイズチェック
-        assert!(grid.len() == simulate_height);
+        assert_eq!(grid.len(), simulate_height);
 
         Ok(Self {
             grid: grid,

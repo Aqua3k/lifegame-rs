@@ -1,6 +1,8 @@
-use std::{cell::Cell, cmp::max};
+use std::{cmp::max};
 use std::thread;
 use std::time::Duration;
+use crossterm::{ExecutableCommand, cursor, terminal};
+use std::io::{stdout, Stdout};
 
 const PADDING_SIZE: usize = 10; // シミュレータ内で拡張するgridのサイズ
 const UPDATE_RATE: u64 = 100; // 描画更新の間隔(ミリ秒単位)
@@ -17,6 +19,7 @@ pub struct LifeGameSimulator {
     grid: Vec<Vec<CellStatus>>,
     simulate_width: usize,
     simulate_height: usize,
+    stdout: Stdout,
 }
 
 #[derive(Clone, PartialEq)]
@@ -88,6 +91,7 @@ impl LifeGameSimulator {
             grid: grid,
             simulate_width: simulate_width,
             simulate_height: simulate_height,
+            stdout: stdout(),
         })
     }
 
@@ -150,8 +154,8 @@ impl LifeGameSimulator {
     }
 
     /// シミュレート中のメソッドをコンソールに描画する
-    fn display(&self) {
-        // TODO とりあえずprintするだけの実装にする
+    fn display(&mut self) {
+        self.stdout.execute(cursor::MoveTo(0, 0)).unwrap();
         println!("#------------------#");
         for array in self.grid.clone() {
             for status in array {
@@ -170,6 +174,10 @@ impl LifeGameSimulator {
     /// シミュレートを開始する
     pub fn start(&mut self) {
         let simulate_turn = 50; // TODO
+
+        self.stdout.execute(terminal::Clear(terminal::ClearType::All)).unwrap();
+        self.stdout.execute(cursor::Hide).unwrap();
+
         self.display();
         thread::sleep(Duration::from_millis(UPDATE_RATE));
         for i in 0..simulate_turn {
@@ -177,5 +185,6 @@ impl LifeGameSimulator {
             self.display();
             thread::sleep(Duration::from_millis(UPDATE_RATE));
         }
+        self.stdout.execute(cursor::Show).unwrap();
     }
 }

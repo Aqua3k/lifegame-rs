@@ -2,6 +2,8 @@ use std::env;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 
+mod simulator;
+
 /// コマンドライン引数からファイルパスを返す
 fn get_file_path() -> Result<String, io::Error> {
     let args: Vec<String> = env::args().collect();

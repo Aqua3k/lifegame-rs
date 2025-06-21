@@ -1,6 +1,9 @@
 use std::cmp::max;
 
-const PADDING_SIZE: usize = 10;
+const PADDING_SIZE: usize = 10; // シミュレータ内で拡張するgridのサイズ
+const UPDATE_RATE: f32 = 0.1; // 描画更新の間隔
+
+const MAX_SIZE: usize = 100; // シミュレート可能なサイズの上限
 
 struct LifeGameSimulator {
     grid: Vec<Vec<CellStatus>>,
@@ -13,7 +16,7 @@ enum CellStatus {
 }
 
 impl LifeGameSimulator {
-    fn new(status: Vec<Vec<u8>>) -> Self{
+    fn new(status: Vec<Vec<u8>>) -> Result<Self, String> {
         // 実際にシミュレートする配列サイズを決定
         let height = status.len();
         let mut max_width: usize = 0;
@@ -22,6 +25,10 @@ impl LifeGameSimulator {
         }
         let simulate_width = max_width + (2 * PADDING_SIZE);
         let simulate_height = height + (2 * PADDING_SIZE);
+
+        if MAX_SIZE < simulate_width || MAX_SIZE < simulate_height {
+            return Err("サイズ上限オーバー".to_string());
+        }
 
         // 行方向 前半のパディングを入れる
         let mut grid: Vec<Vec<CellStatus>> = Vec::new();
@@ -52,6 +59,8 @@ impl LifeGameSimulator {
             for j in 0..PADDING_SIZE {
                 array.push(CellStatus::DEAD);
             }
+
+            // サイズチェック
             assert!(array.len() == simulate_width);
         }
 
@@ -61,6 +70,9 @@ impl LifeGameSimulator {
             grid.push(array);
         }
 
-        Self { grid: grid }
+        // サイズチェック
+        assert!(grid.len() == simulate_height);
+
+        Ok(Self { grid: grid })
     }
 }
